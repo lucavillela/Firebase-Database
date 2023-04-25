@@ -14,9 +14,7 @@ public class Usuarios {
         return nome;
     }
 
-    public void setLogin(String login) {
-        this.login = login;
-    }
+    public void setLogin(String login) { this.login = login; }
 
     public void setNome(String nome) {
         this.nome = nome;
@@ -29,4 +27,6 @@ public class Usuarios {
     public String getSenha() {
         return senha;
     }
+
+    public String toString() {return nome;}
 }

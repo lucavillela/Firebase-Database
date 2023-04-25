@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -15,6 +16,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -26,19 +28,41 @@ public class MainActivity extends AppCompatActivity {
     String idAltoString = "";
     Integer idAlto = 0;
     Integer id = 0;
-    //public ListView ListaUsu;
-    //public List<Usuarios> ListaUsuarios;
+    public ListView ListaUsu;
+    public ArrayList<Usuarios> ListaUsuarios;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        ListaUsuarios = new ArrayList<Usuarios>();
         InputLogin = (EditText) findViewById(R.id.InputLogin);
         InputNome = (EditText) findViewById(R.id.InputNome);
         InputSenha = (EditText) findViewById(R.id.InputSenha);
         CadastrarBtn = (Button) findViewById(R.id.CadastrarBtn);
-        //ListaUsu = (ListView) findViewById(R.id.ListaUsu);
+        ListaUsu = (ListView) findViewById(R.id.ListaUsu);
 
+
+        usuariosBanco.addValueEventListener(new ValueEventListener() {
+
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                ListaUsuarios.clear();
+                for(DataSnapshot current_user: snapshot.getChildren()){
+                    Usuarios u = new Usuarios();
+                    u.setNome(current_user.child("nome").getValue().toString());
+                    u.setLogin(current_user.child("login").getValue().toString());
+                    u.setSenha(current_user.child("senha").getValue().toString());
+                    ListaUsuarios.add(u);
+                }
+                updateLista();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
         GuardaID.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -69,5 +93,14 @@ public class MainActivity extends AppCompatActivity {
         usuarios.setNome(InputNome.getText().toString());
         usuarios.setSenha(InputSenha.getText().toString());
         usuariosBanco.child(id.toString()).setValue(usuarios);
+    }
+    public void updateLista(){
+        ArrayAdapter<Usuarios> adaptador = new ArrayAdapter<>(
+              getApplicationContext(),
+              android.R.layout.simple_list_item_1,
+              android.R.id.text1,
+              ListaUsuarios
+        );
+        ListaUsu.setAdapter(adaptador);
     }
 }
